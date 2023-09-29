@@ -71,6 +71,13 @@ def get_pushups_data_from_users(users: list[str]) -> dict | None:
         args_users_pushups[user_id] = get_pushup_data_from_user(user_id)
     return args_users_pushups
 
+def is_int(message: str) -> bool:
+    try:
+        int(message)
+        return True
+    except:
+        return False
+
 
 @client.event
 async def on_ready():
@@ -94,11 +101,8 @@ async def on_message(message):
             await message.reply(embed=pushups_embed(get_pushups_data_from_users(users)))
         case ['stats']:
             await message.reply(embed=pushups_embed(get_pushups_data_from_users([str(message.author.id)])))
-        case [pushups]:
-            try:
-                pushups = int(pushups)
-            except:
-                return await message.reply(embed=help_embed())
+        case [pushups] if is_int(pushups):
+            pushups = int(pushups)
 
             pushups_data = get_pushup_data()
             total_pushups = pushups_data.get(message.author.id, 0)
@@ -107,6 +111,8 @@ async def on_message(message):
             set_pushup_data(pushups_data)
 
             await message.reply(f"Wow! <@{message.author.id}> just did {pushups} pushups!")
+        case _:
+            await message.reply(embed=help_embed())
 
 if not os.path.exists("pushups.json"):
     with open("pushups.json", "+w") as file:
