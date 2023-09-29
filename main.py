@@ -2,34 +2,13 @@ import discord
 import os
 from dotenv import load_dotenv
 from discord.ext import commands
+import json
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
 client = commands.Bot(intents=intents, command_prefix="!")
-
-async def count_pushups(ctx, users):
-    users_lowercase = list(map(str.lower, users))
-    pushups = {}
-    async for message in ctx.channel.history(limit=None):
-        if message.author.bot:
-            continue
-        if len(users) != 0:
-            if message.author.name.lower() not in users_lowercase or message.author.nick.lower() not in users_lowercase or message.author.global_name.lower() not in users_lowercase:
-                continue
-        try:
-            message_content_number = int(message.content)
-        except:
-            message_content_number = 0
-        name = message.author.global_name
-        if name == None:
-            name = message.author.name
-        if name in pushups:
-            pushups[name] += message_content_number
-        else:
-            pushups[name] = message_content_number
-    return dict(sorted(pushups.items(), key=lambda x:x[1], reverse=True))
 
 def error_embed(name, value):
     embed = discord.Embed(title="Error", colour=discord.Colour.red())
@@ -44,7 +23,33 @@ def pushups_embed(users_pushups):
 
 @client.event
 async def on_ready():
+    client.command_prefix = "<@" + str(client.user.id) + "> "
     print('client ready')
+
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    true_message = str.replace(message.content,"<@" + str(client.user.id) + "> ", "")
+
+    try:
+        pushups = int(true_message)
+    except:
+        return
+    
+    file = open("pushups.json", "r") 
+    pushupsData = json.load(file)
+    file.close()
+
+    totalPushups = pushupsData.get(message.author.id, 0)
+    pushupsData[str(message.author.id)] = totalPushups + pushups
+
+    file = open("pushups.json", "w")
+    json.dump(pushupsData, file)
+    file.close()
+
+    await message.reply("Wow! <@" + str(message.author.id) + "> just did " + str(pushups) + " pushups!")
+    
 
 @client.command()
 async def stats(ctx, *args):
