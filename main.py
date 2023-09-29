@@ -94,18 +94,19 @@ async def on_message(message):
             await message.reply(embed=pushups_embed(get_pushups_data_from_users(users)))
         case ['stats']:
             await message.reply(embed=pushups_embed(get_pushups_data_from_users([str(message.author.id)])))
-        case ['log', pushups]:
+        case [pushups]:
             try:
                 pushups = int(pushups)
             except:
-                return await message.reply(f"Invalid amount of pushups: '{pushups}'")
+                return await message.reply(embed=help_embed())
+
             pushups_data = get_pushup_data()
             total_pushups = pushups_data.get(message.author.id, 0)
+
             pushups_data[str(message.author.id)] = total_pushups + pushups
             set_pushup_data(pushups_data)
+
             await message.reply(f"Wow! <@{message.author.id}> just did {pushups} pushups!")
-        case _:
-            await message.reply(embed=help_embed())
 
 if not os.path.exists("pushups.json"):
     with open("pushups.json", "+w") as file:
