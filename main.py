@@ -50,6 +50,15 @@ def remove_empty_values(array: list[str]):
             result.append(v)
     return result
 
+def get_pushups_data_from_users(users: dict):
+    args_users_pushups = {}
+    for i in range(len(users)):
+        if i == 0:
+            continue
+        user_id = int(users[i][2:len(users[i])-1])
+        args_users_pushups[user_id] = get_pushup_data_from_user(user_id)
+    return args_users_pushups
+
 
 @client.event
 async def on_ready():
@@ -69,13 +78,7 @@ async def on_message(message):
         return
     if args[0] == "stats":
         if len(args) > 1:
-            args_users_pushups = {}
-            for i in range(len(args)):
-                if i == 0:
-                    continue
-                user_id = int(args[i][2:len(args[i])-1])
-                args_users_pushups[user_id] = get_pushup_data_from_user(user_id)
-            return await message.reply(embed=pushups_embed(args_users_pushups))
+            return await message.reply(embed=pushups_embed(get_pushups_data_from_users(args)))
                 
         pushup_data = get_pushup_data()
 
