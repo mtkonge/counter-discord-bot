@@ -75,13 +75,15 @@ def is_int(message: str) -> bool:
     try:
         int(message)
         return True
-    except:
+    except ValueError:
         return False
+
+def is_not_bot_ping(message: str) -> bool:
+    return id != f"<@{client.user.id}>"
 
 
 @client.event
 async def on_ready():
-    client.command_prefix = f"<@{client.user.id}> "
     print('client ready')
 
 @client.event
@@ -90,10 +92,7 @@ async def on_message(message):
         return
 
     args = strip_whitespace(message.content.split(" "))
-    if len(args) == 0:
-        return
-    if extract_id_from_ping(args[0]) != client.user.id:
-        return
+    args = list(filter(is_not_bot_ping, args))
     
     match args[1:]:
         case ['stats', *users] if len(users) != 0:
