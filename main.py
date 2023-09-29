@@ -47,7 +47,7 @@ def remove_empty_values(array: list[str]):
     result: list[str] = []
     for v in array:
         if v:
-            result.append(v)
+            result.append(v.trim())
     return result
 
 def get_pushups_data_from_users(users: dict):
@@ -71,10 +71,10 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    true_message = str.replace(message.content, "<@" + str(client.user.id) + "> ", "")
+    true_message = str.replace(message.content, f"<@{client.user.id}>", "")
     args = true_message.split(" ")
     args = remove_empty_values(args)
-    if not len(args):
+    if len(args) == 0:
         return
     if args[0] == "stats":
         if len(args) > 1:
