@@ -1,5 +1,6 @@
 import discord
 import os
+from collections import OrderedDict
 from dotenv import load_dotenv
 from discord.ext import commands
 import json
@@ -25,7 +26,7 @@ def help_embed():
 
 def pushups_embed(users_pushups: dict):
     embed = discord.Embed(title='Pushups', colour = discord.Colour.blue())
-    for user_id, pushups in users_pushups.items():
+    for user_id, pushups in users_pushups:
         user = client.get_user(int(user_id))
         embed.add_field(name=user.display_name, value=pushups, inline=False)
     return embed
@@ -95,9 +96,10 @@ async def on_message(message):
     match args[1:]:
         case ['stats', *users] if len(users) != 0:
             users = map(extract_id_from_ping, users)
-            await message.reply(embed=pushups_embed(get_pushups_data_from_users(users)))
+            await message.reply(embed=pushups_embed(get_pushups_data_from_users(users).items()))
         case ['stats']:
-            await message.reply(embed=pushups_embed(get_pushups_data_from_users(get_pushup_data())))
+            pushup_data = sorted(get_pushup_data().items(), key=lambda item: item[1], reverse=True)
+            await message.reply(embed=pushups_embed(pushup_data))
         case [pushups] if is_int(pushups):
             pushups = int(pushups)
 
