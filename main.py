@@ -34,15 +34,15 @@ def pushups_embed(users_pushups: dict):
 
 def get_pushup_data_from_user(user_id: int) -> int:
     file = open(JSON_FILE, "r")  
-    pushups_data = json.load(file)
+    pushup_data = json.load(file)
     file.close()
-    return pushups_data.get(str(user_id), 0)
+    return pushup_data.get(str(user_id), 0)
 
 def get_pushup_data() -> dict:
     file = open(JSON_FILE, "r") 
-    pushups_data = json.load(file)
+    pushup_data = json.load(file)
     file.close()
-    return pushups_data
+    return pushup_data
 
 def set_pushup_data(pushup_data: str):
     file = open(JSON_FILE, "w")
@@ -103,11 +103,11 @@ async def on_message(message):
         case [pushups] if is_int(pushups):
             pushups = int(pushups)
 
-            pushups_data = get_pushup_data()
-            total_pushups = pushups_data.get(message.author.id, 0)
+            pushup_data = get_pushup_data()
+            total_pushups = pushup_data.get(str(message.author.id), 0)
 
-            pushups_data[str(message.author.id)] = total_pushups + pushups
-            set_pushup_data(pushups_data)
+            pushup_data[str(message.author.id)] = total_pushups + pushups
+            set_pushup_data(pushup_data)
 
             await message.reply(f"Wow! <@{message.author.id}> just did {pushups} pushups!")
         case _:

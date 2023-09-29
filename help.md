@@ -7,5 +7,5 @@ Next time, try:
 - view stats for N amount of users
     @Pushups Counter stats @User0 ... @UserN
 - log your pushups
-    @Pushups Counter log 1337
+    @Pushups Counter 1337
 ```
