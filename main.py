@@ -97,7 +97,7 @@ async def on_message(message):
             users = map(extract_id_from_ping, users)
             await message.reply(embed=pushups_embed(get_pushups_data_from_users(users)))
         case ['stats']:
-            await message.reply(embed=pushups_embed(get_pushups_data_from_users([str(message.author.id)])))
+            await message.reply(embed=pushups_embed(get_pushups_data_from_users(get_pushup_data())))
         case [pushups] if is_int(pushups):
             pushups = int(pushups)
 
