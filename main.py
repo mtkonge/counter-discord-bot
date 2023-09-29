@@ -75,11 +75,8 @@ def is_int(message: str) -> bool:
     try:
         int(message)
         return True
-    except ValueError:
+    except:
         return False
-
-def is_not_bot_ping(message: str) -> bool:
-    return id != f"<@{client.user.id}>"
 
 
 @client.event
@@ -92,7 +89,8 @@ async def on_message(message):
         return
 
     args = strip_whitespace(message.content.split(" "))
-    args = list(filter(is_not_bot_ping, args))
+    if extract_id_from_ping(args[0]) != client.user.id:
+        return
     
     match args[1:]:
         case ['stats', *users] if len(users) != 0:
