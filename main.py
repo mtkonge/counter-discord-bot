@@ -92,26 +92,34 @@ async def on_message(message):
     args = strip_whitespace(message.content.split(" "))
     if extract_id_from_ping(args[0]) != client.user.id:
         return
-    
-    match args[1:]:
-        case ['stats', *users] if len(users) != 0:
-            users = map(extract_id_from_ping, users)
+
+    # Statistics
+    if args[1] == 'stats':
+        # For specific user
+        if len(args) > 2:
+            users = map(extract_id_from_ping, args[2:])
             await message.reply(embed=pushups_embed(get_pushups_data_from_users(users).items()))
-        case ['stats']:
+
+        # For all users
+        else:
             pushup_data = sorted(get_pushup_data().items(), key=lambda item: item[1], reverse=True)
             await message.reply(embed=pushups_embed(pushup_data))
-        case [pushups] if is_int(pushups):
-            pushups = int(pushups)
 
-            pushup_data = get_pushup_data()
-            total_pushups = pushup_data.get(str(message.author.id), 0)
+    # Add pushups
+    elif is_int(args[1]):
+        pushups = int(args[1])
 
-            pushup_data[str(message.author.id)] = total_pushups + pushups
-            set_pushup_data(pushup_data)
+        pushup_data = get_pushup_data()
+        total_pushups = pushup_data.get(str(message.author.id), 0)
 
-            await message.reply(f"Wow! <@{message.author.id}> just did {pushups} pushups!")
-        case _:
-            await message.reply(embed=help_embed())
+        pushup_data[str(message.author.id)] = total_pushups + pushups
+        set_pushup_data(pushup_data)
+
+        await message.reply(f"Wow! <@{message.author.id}> just did {pushups} pushups!")
+
+    # Show help
+    else:
+        await message.reply(embed=help_embed())
 
 if not os.path.exists("pushups.json"):
     with open("pushups.json", "+w") as file:
